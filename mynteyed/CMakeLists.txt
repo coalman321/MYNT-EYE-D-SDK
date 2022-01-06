@@ -70,7 +70,7 @@ message(STATUS "CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 
 LIST(APPEND CMAKE_MODULE_PATH ${MYNTEYE_ROOT}/cmake)
 
-set(OpenCV_FIND_QUIET TRUE)
+set(OpenCV_FIND_QUIET FALSE)
 include(${MYNTEYE_ROOT}/cmake/DetectOpenCV.cmake)
 
 set(JPEG_FIND_QUIET TRUE)
@@ -114,7 +114,7 @@ include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}/include
 )
 
-add_definitions(-DMYNTEYE_EXPORTS)
+add_definitions(-DMYNTEYE_EXPORTS -DWITH_OPENCV)
 
 ## mynteye_depth
 
@@ -266,26 +266,15 @@ configure_file(
   "${MYNTEYE_ROOT}/platforms/linux/sdk.cfg"
 )
 
-# winpack.nsi
-
-if(OS_WIN)
-  configure_file(
-    scripts/win/nsis/winpack.nsi.in
-    ${CMAKE_CURRENT_SOURCE_DIR}/winpack.nsi @ONLY
-  )
-endif()
-
 # install
 
-set(MYNTEYE_CMAKE_INCLUDE_DIR "${CMAKE_INSTALL_PREFIX}/include/${MYNTEYE_NAME}")
-set(MYNTEYE_CMAKE_BINDIR "${CMAKE_INSTALL_PREFIX}/bin")
-set(MYNTEYE_CMAKE_LIBDIR "${CMAKE_INSTALL_PREFIX}/lib")
-set(MYNTEYE_CMAKE_INSTALLDIR "${MYNTEYE_CMAKE_LIBDIR}/cmake/${MYNTEYE_NAME}")
+set(MYNTEYE_CMAKE_BINDIR "${PROJECT_NAME}/bin")
+set(MYNTEYE_CMAKE_LIBDIR "${PROJECT_NAME}/lib")
 
 install(DIRECTORY
     "${MYNTEYE_ROOT}/include"
     "${CMAKE_CURRENT_BINARY_DIR}/include"
-  DESTINATION ${CMAKE_INSTALL_PREFIX}
+    DESTINATION include/${PROJECT_NAME}
   FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
 )
 
@@ -302,34 +291,9 @@ install(DIRECTORY "${__3rdparty_out_dir}"
 
 install(TARGETS ${MYNTEYE_DEPTH}
   EXPORT mynteyed-targets
-  ARCHIVE DESTINATION ${MYNTEYE_CMAKE_LIBDIR}
-  LIBRARY DESTINATION ${MYNTEYE_CMAKE_LIBDIR}
-  RUNTIME DESTINATION ${MYNTEYE_CMAKE_BINDIR}
-)
-
-## cmake files
-
-include(CMakePackageConfigHelpers)
-
-configure_package_config_file(mynteyed-config.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/mynteyed-config.cmake
-  INSTALL_DESTINATION ${MYNTEYE_CMAKE_INSTALLDIR}
-  NO_CHECK_REQUIRED_COMPONENTS_MACRO
-)
-
-write_basic_package_version_file(mynteyed-config-version.cmake
-  VERSION ${PROJECT_VERSION} COMPATIBILITY SameMajorVersion
-)
-
-install(FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/mynteyed-config.cmake
-  ${CMAKE_CURRENT_BINARY_DIR}/mynteyed-config-version.cmake
-  DESTINATION ${MYNTEYE_CMAKE_INSTALLDIR}
-)
-
-install(EXPORT mynteyed-targets
-  #NAMESPACE mynteyed::
-  DESTINATION ${MYNTEYE_CMAKE_INSTALLDIR}
+  RUNTIME DESTINATION bin
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
 )
 
 # summary

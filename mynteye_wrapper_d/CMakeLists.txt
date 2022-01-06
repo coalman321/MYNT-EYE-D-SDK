@@ -20,7 +20,7 @@ find_package(image_transport REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(visualization_msgs REQUIRED)
-find_package(OpenCV 4 QUIET
+find_package(OpenCV 4 REQUIRED
   COMPONENTS
     opencv_core
     opencv_imgproc
@@ -29,8 +29,12 @@ find_package(OpenCV 4 QUIET
 )
 
 # targets
-
-set(AMENT_LIBRARIES
+add_executable(mynteye_wrapper_d_node src/mynteye_wrapper_node.cc)
+target_include_directories(mynteye_wrapper_d_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_compile_features(mynteye_wrapper_d_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+ament_target_dependencies(mynteye_wrapper_d_node 
   mynteyed
   sensor_msgs
   std_msgs
@@ -43,21 +47,23 @@ set(AMENT_LIBRARIES
   visualization_msgs
 )
 
-add_executable(mynteye_wrapper_d_node src/mynteye_wrapper_node.cc)
-target_include_directories(mynteye_wrapper_d_node PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-  ${CMAKE_CURRENT_SOURCE_DIR}/tacopie/includes)
-target_compile_features(mynteye_wrapper_d_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
-ament_target_dependencies(mynteye_wrapper_d_node ${AMENT_LIBRARIES})
-
 add_executable(mynteye_listener_d src/mynteye_listener.cc)
 target_include_directories(mynteye_listener_d PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-  ${CMAKE_CURRENT_SOURCE_DIR}/tacopie/includes)
+  $<INSTALL_INTERFACE:include>)
 target_compile_features(mynteye_listener_d PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
-ament_target_dependencies(mynteye_listener_d ${AMENT_LIBRARIES})
+ament_target_dependencies(mynteye_listener_d 
+mynteyed
+sensor_msgs
+std_msgs
+tf2
+tf2_ros
+rclcpp
+image_transport
+cv_bridge
+OpenCV
+visualization_msgs
+)
 
 #generate messages
 rosidl_generate_interfaces(${PROJECT_NAME}
@@ -74,7 +80,7 @@ rosidl_target_interfaces(mynteye_listener_d
 
 # install
 
-install(TARGETS mynteye_listener_d mynteye_wrapper_d_node
+install(TARGETS mynteye_wrapper_d_node mynteye_listener_d
   DESTINATION lib/${PROJECT_NAME})
 
 # Install launch files.

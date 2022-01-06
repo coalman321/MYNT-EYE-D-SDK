@@ -23,7 +23,7 @@ endif()
 
 if(OpenCV_FOUND)
 
-#message(STATUS "Found OpenCV: ${OpenCV_VERSION}")
+message(STATUS "Found OpenCV: ${OpenCV_VERSION}")
 
 set(WITH_OPENCV TRUE)
 add_definitions(-DWITH_OPENCV)
