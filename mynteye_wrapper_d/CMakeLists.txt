@@ -19,23 +19,9 @@ find_package(rclcpp REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(cv_bridge REQUIRED)
-
 find_package(OpenCV REQUIRED)
-if(OpenCV_FOUND)
-  message(STATUS "OpenCV is found.")
-  set(WITH_OPENCV TRUE)
-  add_definitions(-DWITH_OPENCV)
-  message(STATUS "Defined WITH_OPENCV.")
-endif()
-
 
 # targets
-add_compile_options(-std=c++11)
-
-include_directories(
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-)
 
 set(AMENT_LIBRARIES
   mynteyed
@@ -46,12 +32,23 @@ set(AMENT_LIBRARIES
   rclcpp
   image_transport
   cv_bridge
+  OpenCV
 )
 
 add_executable(mynteye_wrapper_d_node src/mynteye_wrapper_node.cc)
+target_include_directories(mynteye_wrapper_d_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+  ${CMAKE_CURRENT_SOURCE_DIR}/tacopie/includes)
+target_compile_features(mynteye_wrapper_d_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 ament_target_dependencies(mynteye_wrapper_d_node ${LINK_LIBRARIES})
 
 add_executable(mynteye_listener_d src/mynteye_listener.cc)
+target_include_directories(mynteye_listener_d PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+  ${CMAKE_CURRENT_SOURCE_DIR}/tacopie/includes)
+target_compile_features(mynteye_listener_d PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 ament_target_dependencies(mynteye_listener_d ${LINK_LIBRARIES})
 
 #generate messages
@@ -60,12 +57,15 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   DEPENDENCIES std_msgs
 )
 ament_export_dependencies(rosidl_default_runtime)
-rosidl_target_interfaces(dvl
+rosidl_target_interfaces(mynteye_wrapper_d_node
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+
+rosidl_target_interfaces(mynteye_listener_d
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 # install
 
-install(TARGETS mynteye_wrapper_d mynteye_wrapper_d_node
+install(TARGETS mynteye_listener_d mynteye_wrapper_d_node
   DESTINATION lib/${PROJECT_NAME})
 
 # Install launch files.
