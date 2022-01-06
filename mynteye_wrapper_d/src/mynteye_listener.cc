@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #include <cv_bridge/cv_bridge.h>
-#include <image_transport/image_transport.h>
+#include <image_transport/image_transport.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <chrono>
 
@@ -72,13 +72,13 @@ class MYNTEYEListener : public rclcpp::Node {
             if (!rclcpp::ok()) {
                 RCLCPP_ERROR(this->get_logger(),
                              "Interrupted while waiting for service");
-                return;
+                return "null";
             }
         }
         auto result = client->async_send_request(request);
         if (rclcpp::spin_until_future_complete(this->shared_from_this(), result) ==
             rclcpp::FutureReturnCode::SUCCESS) {
-            return result->value;
+            return result.get()->value;
         } else {
             RCLCPP_ERROR(this->get_logger(),
                          "Failed to call service GetParams, make sure you have "

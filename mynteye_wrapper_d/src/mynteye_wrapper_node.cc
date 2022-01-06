@@ -11,8 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include <ros/ros.h>
-#include <nodelet/loader.h>
+#include <rclcpp/rclcpp.hpp>
 
 int main(int argc, char* argv[]) {
   ros::init(argc, argv, "mynteye_wrapper_d_node");
@@ -24,7 +23,7 @@ int main(int argc, char* argv[]) {
       "mynteye_wrapper_d/MYNTEYEWrapperNodelet",
       remap, nargv);
 
-  ros::spin();
+  rclcpp::spin();
 
   return 0;
 }

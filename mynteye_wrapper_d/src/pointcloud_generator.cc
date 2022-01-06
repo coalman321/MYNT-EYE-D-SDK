@@ -36,7 +36,7 @@ PointCloudGenerator::~PointCloudGenerator() {
 }
 
 bool PointCloudGenerator::Push(const cv::Mat& color, const cv::Mat& depth,
-    ros::Time stamp) {
+    rclcpp::Time stamp) {
   if (!running_) {
     throw new std::runtime_error("Start first!");
   }
@@ -85,7 +85,7 @@ void PointCloudGenerator::Run() {
       if (!running_) break;
     }
 
-    sensor_msgs::PointCloud2 msg;
+    sensor_msgs::msg::PointCloud2 msg;
     msg.header.stamp = stamp_;
     msg.width = depth_.cols;
     msg.height = depth_.rows;
@@ -94,10 +94,10 @@ void PointCloudGenerator::Run() {
     sensor_msgs::PointCloud2Modifier modifier(msg);
 
     modifier.setPointCloud2Fields(4,
-        "x", 1, sensor_msgs::PointField::FLOAT32,
-        "y", 1, sensor_msgs::PointField::FLOAT32,
-        "z", 1, sensor_msgs::PointField::FLOAT32,
-        "rgb", 1, sensor_msgs::PointField::FLOAT32);
+        "x", 1, sensor_msgs::msg::PointField::FLOAT32,
+        "y", 1, sensor_msgs::msg::PointField::FLOAT32,
+        "z", 1, sensor_msgs::msg::PointField::FLOAT32,
+        "rgb", 1, sensor_msgs::msg::PointField::FLOAT32);
     modifier.setPointCloud2FieldsByString(2, "xyz", "rgb");
 
     sensor_msgs::PointCloud2Iterator<float> iter_x(msg, "x");

@@ -19,7 +19,14 @@ find_package(rclcpp REQUIRED)
 find_package(image_transport REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(cv_bridge REQUIRED)
-find_package(OpenCV REQUIRED)
+find_package(visualization_msgs REQUIRED)
+find_package(OpenCV 4 QUIET
+  COMPONENTS
+    opencv_core
+    opencv_imgproc
+    opencv_imgcodecs
+  CONFIG
+)
 
 # targets
 
@@ -33,6 +40,7 @@ set(AMENT_LIBRARIES
   image_transport
   cv_bridge
   OpenCV
+  visualization_msgs
 )
 
 add_executable(mynteye_wrapper_d_node src/mynteye_wrapper_node.cc)
@@ -41,7 +49,7 @@ target_include_directories(mynteye_wrapper_d_node PUBLIC
   $<INSTALL_INTERFACE:include>
   ${CMAKE_CURRENT_SOURCE_DIR}/tacopie/includes)
 target_compile_features(mynteye_wrapper_d_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
-ament_target_dependencies(mynteye_wrapper_d_node ${LINK_LIBRARIES})
+ament_target_dependencies(mynteye_wrapper_d_node ${AMENT_LIBRARIES})
 
 add_executable(mynteye_listener_d src/mynteye_listener.cc)
 target_include_directories(mynteye_listener_d PUBLIC
@@ -49,7 +57,7 @@ target_include_directories(mynteye_listener_d PUBLIC
   $<INSTALL_INTERFACE:include>
   ${CMAKE_CURRENT_SOURCE_DIR}/tacopie/includes)
 target_compile_features(mynteye_listener_d PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
-ament_target_dependencies(mynteye_listener_d ${LINK_LIBRARIES})
+ament_target_dependencies(mynteye_listener_d ${AMENT_LIBRARIES})
 
 #generate messages
 rosidl_generate_interfaces(${PROJECT_NAME}
@@ -57,6 +65,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   DEPENDENCIES std_msgs
 )
 ament_export_dependencies(rosidl_default_runtime)
+
 rosidl_target_interfaces(mynteye_wrapper_d_node
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
